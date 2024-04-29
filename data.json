@@ -1,0 +1,84 @@
+{
+  "characters": [
+    {
+      "name": "Bob Belcher",
+      "age": 46,
+      "quotes": [
+        {
+          "content": "Birds are evil! I've lost all respect for them.",
+          "season": 11,
+          "episode": 20
+        },
+        {
+          "content": "I could take Santa.",
+          "season": 4,
+          "episode": 8
+        }
+      ]
+    },
+    {
+      "name": "Linda Belcher",
+      "age": 44,
+      "quotes": [
+        {
+          "content": "I'm great at math. Four!",
+          "season": 9,
+          "episode": 8
+        },
+        {
+          "content": "Ooh, Mutiny? This boat has so many activities!",
+          "season": 3,
+          "episode": 4
+        }
+      ]
+    },
+    {
+      "name": "Tina Belcher",
+      "age": 13,
+      "quotes": [
+        {
+          "content": "Do you think horses get songs stuck in their heads?",
+          "season": 1,
+          "episode": 7
+        },
+        {
+          "content": "Your ass is grass, and I'm gonna mow it.",
+          "season": 3,
+          "episode": 19
+        }
+      ]
+    },
+    {
+      "name": "Gene Belcher",
+      "age": 11,
+      "quotes": [
+        {
+          "content": "We're Belchers, from the womb to the tomb!",
+          "season": 2,
+          "episode": 8
+        },
+        {
+          "content": "You flew too close to the Sun Chips.",
+          "season": 9,
+          "episode": 3
+        }
+      ]
+    },
+    {
+      "name": "Louise Belcher",
+      "age": 9,
+      "quotes": [
+        {
+          "content": "I smell fear on you.",
+          "season": 2,
+          "episode": 9
+        },
+        {
+          "content": "Hey, I don't appreciate your lack of sarcasm.",
+          "season": 4,
+          "episode": 7
+        }
+      ]
+    }
+  ]
+}

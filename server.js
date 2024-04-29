@@ -1,42 +1,30 @@
-require('dotenv').config();
+if (!process.env.PORT) {
+  require('dotenv').config();
+}
 
+// Module Imports
 const express = require('express');
-var cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
-
-const app = express();
-
 const bodyParser = require('body-parser');
-const expressValidator = require('express-validator');
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-
-app.use(expressValidator());
-app.use(cookieParser());
-
+// const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 require('./data/db');
 
-var checkAuth = (req, res, next) => {
-  console.log("Checking authentication");
-  if (typeof req.cookies.nToken === "undefined" || req.cookies.nToken === null) {
-    req.user = null;
-  } else {
-    var token = req.cookies.nToken;
-    var decodedToken = jwt.decode(token, { complete: true }) || {};
-    req.user = decodedToken.payload;
-  }
+// App and Middleware Configuration
+const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-  next();
-};
-app.use(checkAuth);
+// Routes
+const characters = require('./controllers/characters');
+characters(app);
+// const quotes = require('./controllers/quotes');
+// quotes(app);
+const auth = require('./controllers/auth.js');
+auth(app);
 
-
-// TODO: Add each controller here, after all middleware is initialized.
-
-
+// Start the Server
 app.listen(3000, () => {
-    console.log('API listening on port http://localhost:3000!');
-  });
+  console.log('App listening on port 3000!');
+});
 
 module.exports = app;
