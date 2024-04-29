@@ -5,7 +5,6 @@ if (!process.env.PORT) {
 // Module Imports
 const express = require('express');
 const bodyParser = require('body-parser');
-// const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 require('./data/db');
 
@@ -17,14 +16,14 @@ app.use(cookieParser());
 // Routes
 const characters = require('./controllers/characters');
 characters(app);
-// const quotes = require('./controllers/quotes');
-// quotes(app);
+const quotes = require('./controllers/quotes');
+quotes(app);
 const auth = require('./controllers/auth.js');
 auth(app);
 
 // Start the Server
 app.listen(3000, () => {
-  console.log('App listening on port 3000!');
+  console.log('App listening at http://localhost:3000');
 });
 
 module.exports = app;
