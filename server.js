@@ -21,34 +21,7 @@ quotes(app);
 const auth = require('./controllers/auth.js');
 auth(app);
 
-const jwt = require('jsonwebtoken');
-
-function ensureAuthenticated(req, res, next) {
-  // Check for the token in the request headers
-  const token = req.headers['authorization'];
-
-  if (!token) {
-    // If no token is provided, send a 401 Unauthorized response
-    return res.status(401).send({ message: 'Unauthorized: No token provided' });
-  }
-
-  // Verify the token
-  jwt.verify(token, process.env.SECRET, (err, decoded) => {
-    if (err) {
-      // If the token is not valid, send a 401 Unauthorized response
-      return res.status(401).send({ message: 'Unauthorized: Invalid token' });
-    }
-
-    // If everything is good, save the decoded token to the request for use in other routes
-    req.user = decoded;
-    next();
-  });
-}
-
-// Use the middleware function in your routes
-app.get('/protected-route', ensureAuthenticated, (req, res) => {
-  // This route is now protected
-});
+const { ensureAuthenticated } = require('./middleware');
 
 // Start the Server
 app.listen(3000, () => {

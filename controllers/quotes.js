@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const Quote = require('../models/quote');
+const { ensureAuthenticated } = require('../middleware');
 
 module.exports = function (app) {
   // GET ALL
-  app.get('/quotes', (req, res) => {
+  app.get('/quotes', ensureAuthenticated, (req, res) => {
     Quote.find()
       .then((quotes) => {
         if (quotes.length === 0) {
@@ -18,7 +19,7 @@ module.exports = function (app) {
   });
 
   // SHOW
-  app.get('/quotes/:id', (req, res) => {
+  app.get('/quotes/:id', ensureAuthenticated, (req, res) => {
     Quote.findById(req.params.id)
       .then((quote) => {
         if (!quote) {
@@ -33,7 +34,7 @@ module.exports = function (app) {
   });
 
   // CREATE
-  app.post('/quotes', (req, res) => {
+  app.post('/quotes', ensureAuthenticated, (req, res) => {
     if (!req.body.content || !req.body.season || !req.body.episode || !req.body.characterId) {
       return res.status(400).json({ error: 'All fields are required' });
     }
@@ -48,7 +49,7 @@ module.exports = function (app) {
   });
 
   // UPDATE
-  app.put('/quotes/:id', (req, res) => {
+  app.put('/quotes/:id', ensureAuthenticated, (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ error: 'Invalid ID' });
     }
@@ -66,7 +67,7 @@ module.exports = function (app) {
   });
 
   // DELETE
-  app.delete('/quotes/:id', function (req, res) {
+  app.delete('/quotes/:id', ensureAuthenticated, (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ error: 'Invalid ID' });
     }
