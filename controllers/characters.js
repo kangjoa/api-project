@@ -35,13 +35,20 @@ module.exports = function (app) {
 
   // CREATE
   app.post('/characters', ensureAuthenticated, (req, res) => {
-    if (!req.body.content || !req.body.season || !req.body.episode || !req.body.characterId) {
+    if (
+      !req.body.content ||
+      !req.body.season ||
+      !req.body.episode ||
+      !req.body.characterId
+    ) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
     Character.create(req.body)
       .then((character) => {
-        res.status(201).json({ message: 'Character successfully created', character });
+        res
+          .status(201)
+          .json({ message: 'Character successfully created', character });
       })
       .catch((err) => {
         res.status(500).json({ error: err.message });
@@ -59,7 +66,9 @@ module.exports = function (app) {
         if (!character) {
           return res.status(404).json({ error: 'No characters found' });
         }
-        res.status(200).json({ message: 'Character successfully updated', character });
+        res
+          .status(200)
+          .json({ message: 'Character successfully updated', character });
       })
       .catch((err) => {
         res.status(500).json({ error: err.message });

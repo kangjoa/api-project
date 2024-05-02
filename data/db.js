@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const Character = require('../models/character');
 const Quote = require('../models/quote');
+const User = require('../models/user');
 
 const url = 'mongodb://localhost/db';
 
@@ -18,7 +19,16 @@ mongoose
       await mongoose.connection.collections[i].deleteMany({});
     }
 
-    const data = JSON.parse(fs.readFileSync(path.join(__dirname, '../data.json'), 'utf8'));
+    const user = new User({
+      username: 'testUser',
+      password: 'testPassword',
+    });
+
+    await user.save();
+
+    const data = JSON.parse(
+      fs.readFileSync(path.join(__dirname, '../data.json'), 'utf8'),
+    );
 
     data.characters.forEach(async (characterData) => {
       const character = new Character({

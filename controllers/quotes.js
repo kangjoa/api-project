@@ -35,7 +35,12 @@ module.exports = function (app) {
 
   // CREATE
   app.post('/quotes', ensureAuthenticated, (req, res) => {
-    if (!req.body.content || !req.body.season || !req.body.episode || !req.body.characterId) {
+    if (
+      !req.body.content ||
+      !req.body.season ||
+      !req.body.episode ||
+      !req.body.characterId
+    ) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 

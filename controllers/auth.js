@@ -34,9 +34,10 @@ module.exports = (app) => {
   // LOGIN
   app.post('/login', async (req, res) => {
     const { username, password } = req.body;
+    console.log(`username and password log`, req.body);
 
     try {
-      const user = await User.findOne({ username }, 'username password');
+      const user = await User.findOne({ username }, { password });
       if (!user) {
         // User not found
         return res.status(401).send({ message: 'Wrong Username or Password' });
@@ -59,9 +60,9 @@ module.exports = (app) => {
         },
       );
 
-      // Set a cookie and redirect to root
+      // Set a cookie and return the token
       res.cookie('nToken', token, { maxAge: 900000, httpOnly: true });
-      return res.redirect('/');
+      return res.status(200).send({ token });
     } catch (err) {
       console.log(err);
       res.status(500).send({ message: 'Internal Server Error' });
