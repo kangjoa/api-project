@@ -1,16 +1,25 @@
-const app = require('./../server');
+const app = require('../server');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const should = chai.should();
 const Character = require('../models/character');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 chai.use(chaiHttp);
+
+function generateToken(payload) {
+  return jwt.sign(payload, process.env.SECRET);
+}
 
 describe('API Tests', function () {
   let createdCharacter;
 
   // Create a character object before each test
   beforeEach((done) => {
+    const token = generateToken({ _id: '6634078a62923d7cabdc96cd' });
+    chai.request(app).set('Authorization', `Bearer ${token}`);
+
     Character.create({
       name: 'Regular Sized Rudy',
       age: 10,
@@ -60,7 +69,7 @@ describe('API Tests', function () {
       });
   });
 
-  it.skip('should create a single character on /characters POST', (done) => {
+  it('should create a single character on /characters POST', (done) => {
     let newCharacter = {
       name: 'Teddy',
       age: 50,
