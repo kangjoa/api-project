@@ -21,6 +21,8 @@ quotes(app);
 const auth = require('./controllers/auth.js');
 auth(app);
 
+const { ensureAuthenticated } = require('./middleware');
+
 // Start the Server
 app.listen(3000, () => {
   console.log('App listening at http://localhost:3000');

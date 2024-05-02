@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 module.exports = (app) => {
   // SIGN UP FORM
-  app.get('/sign-up', (req, res) => res.render('sign-up'));
+  // app.get('/sign-up', (req, res) => res.status(200));
 
   app.post('/sign-up', async (req, res) => {
     // Create User and JWT
@@ -23,13 +23,13 @@ module.exports = (app) => {
   });
 
   // LOGOUT
-  app.get('/logout', (req, res) => {
-    res.clearCookie('nToken');
-    return res.redirect('/');
-  });
+  // app.get('/logout', (req, res) => {
+  //   res.clearCookie('nToken');
+  //   return res.redirect('/');
+  // });
 
   // LOGIN FORM
-  app.get('/login', (req, res) => res.render('login'));
+  // app.get('/login', (req, res) => res.render('login'));
 
   // LOGIN
   app.post('/login', async (req, res) => {
