@@ -35,16 +35,10 @@ module.exports = function (app) {
 
   // CREATE
   app.post('/characters', ensureAuthenticated, (req, res) => {
-    if (
-      !req.body.content ||
-      !req.body.season ||
-      !req.body.episode ||
-      !req.body.characterId
-    ) {
-      return res.status(400).json({ error: 'All fields are required' });
-    }
+    const character = new Character(req.body);
 
-    Character.create(req.body)
+    character
+      .save()
       .then((character) => {
         res
           .status(201)

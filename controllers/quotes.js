@@ -35,16 +35,10 @@ module.exports = function (app) {
 
   // CREATE
   app.post('/quotes', ensureAuthenticated, (req, res) => {
-    if (
-      !req.body.content ||
-      !req.body.season ||
-      !req.body.episode ||
-      !req.body.characterId
-    ) {
-      return res.status(400).json({ error: 'All fields are required' });
-    }
+    const quote = new Quote(req.body);
 
-    Quote.create(req.body)
+    quote
+      .save()
       .then((quote) => {
         res.status(201).json({ message: 'Quote successfully created', quote });
       })
