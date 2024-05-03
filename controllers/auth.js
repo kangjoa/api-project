@@ -7,18 +7,20 @@ module.exports = (app) => {
 
   app.post('/sign-up', async (req, res) => {
     // Create User and JWT
-    const user = new User(req.body);
-
     try {
+      const user = new User(req.body);
       await user.save();
+
       const token = jwt.sign({ _id: user._id }, process.env.SECRET, {
         expiresIn: '60 days',
       });
       res.cookie('nToken', token, { maxAge: 900000, httpOnly: true });
-      return res.redirect('/');
+      res.status(201).send({ message: 'User successfully created', token });
     } catch (err) {
       console.log(err.message);
-      return res.status(400).send({ err });
+      return res
+        .status(400)
+        .send({ error: 'Failed to create user', message: err.message });
     }
   });
 
