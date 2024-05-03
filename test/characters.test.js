@@ -1,123 +1,122 @@
-const app = require('../server');
+// run tests with:  mocha test/characters.test.js --exit
+
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const expect = chai.expect;
 const should = chai.should();
+const app = require('../server');
+const User = require('../models/user');
 const Character = require('../models/character');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 chai.use(chaiHttp);
 
-function generateToken(payload) {
-  return jwt.sign(payload, process.env.SECRET);
-}
+describe('Character API Tests', function () {
+  let testUser;
+  let token;
+  let testCharacter;
 
-describe('API Tests', function () {
-  let createdCharacter;
-
-  // Create a character object before each test
-  beforeEach((done) => {
-    const token = generateToken({ _id: '6634078a62923d7cabdc96cd' });
-    chai.request(app).set('Authorization', `Bearer ${token}`);
-
-    Character.create({
+  before(async () => {
+    try {
+      testUser = await User.create({
+        username: 'testUser2',
+        password: 'testPassword2',
+      });
+      token = jwt.sign({ _id: testUser._id }, process.env.SECRET, {
+        expiresIn: '2h',
+      });
+    } catch (error) {
+      console.error('Error during user creation:', error);
+    }
+    testCharacter = await Character.create({
       name: 'Regular Sized Rudy',
       age: 10,
-    })
-      .then((character) => {
-        createdCharacter = character;
-        done();
-      })
-      .catch((err) => done(err));
+    });
   });
 
-  // Delete the created character after each test
-  afterEach((done) => {
-    if (createdCharacter) {
-      Character.deleteOne({ _id: createdCharacter._id })
-        .then(() => done())
-        .catch((err) => done(err));
-    } else {
-      done();
-    }
+  after(async () => {
+    await User.deleteOne({ _id: testUser._id });
   });
 
-  it('should get all characters on /characters GET', (done) => {
-    // Adding a delay to allow the database to populate
-    setTimeout(() => {
-      chai
-        .request(app)
-        .get('/characters')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('object');
-          res.body.should.have.property('characters').with.lengthOf.at.least(1);
-          done();
-        });
-    }, 500);
-  });
-
-  it('should show a single character on /characters/:id GET', (done) => {
-    chai
+  it('should get all characters on /characters GET', async () => {
+    const res = await chai
       .request(app)
-      .get(`/characters/${createdCharacter._id}`)
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.a('object');
-        res.body.character.should.have.property('name');
-        done();
-      });
+      .get('/characters')
+      .set('Cookie', `nToken=${token}`);
+    console.log('Response Status:', res.status);
+    console.log('Response Body:', res.body);
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property('characters');
+    res.body.should.have.property('characters').with.lengthOf.at.least(1);
   });
 
-  it('should create a single character on /characters POST', (done) => {
-    let newCharacter = {
-      name: 'Teddy',
-      age: 50,
-    };
+  it('should get a single character on /characters/:id GET', async () => {
+    const res = await chai
+      .request(app)
+      .get(`/characters/${testCharacter._id}`)
+      .set('Cookie', `nToken=${token}`);
+    console.log('Response Status:', res.status);
+    console.log('Response Body:', res.body);
 
-    chai
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property('character');
+    expect(res.body.character)
+      .to.have.property('name')
+      .equal('Regular Sized Rudy');
+  });
+
+  it('should create a character on /characters POST', async () => {
+    const res = await chai
       .request(app)
       .post('/characters')
-      .send(newCharacter)
-      .end((err, res) => {
-        if (err) {
-          console.error('Error:', err);
-        }
-        res.should.have.status(201);
-        res.body.should.be.a('object');
-        res.body.should.have
-          .property('message')
-          .eql('Character successfully created');
-        res.body.character.should.have.property('name').eql('Teddy');
-        done();
+      .set('Cookie', `nToken=${token}`)
+      .send({
+        name: 'Teddy',
+        age: 50,
       });
+    console.log('Response Status:', res.status);
+    console.log('Response Body:', res.body);
+
+    expect(res).to.have.status(201);
+    expect(res.body).to.have.property('character');
+    expect(res.body.character).to.have.property('name').equal('Teddy');
+    expect(res.body.character).to.have.property('age').equal(50);
   });
 
-  it('should update a single character on /characters/:id PUT', (done) => {
-    chai
+  it('should update a character on /characters/:id PUT', async () => {
+    const res = await chai
       .request(app)
-      .put(`/characters/${createdCharacter._id}`)
-      .send({ name: 'Regular Sized Rudy' })
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.a('object');
-        res.body.character.should.have
-          .property('name')
-          .eql('Regular Sized Rudy');
-        done();
+      .put(`/characters/${testCharacter._id}`)
+      .set('Cookie', `nToken=${token}`)
+      .send({
+        name: 'Rudy',
+        age: 10,
       });
+    console.log('Response Status:', res.status);
+    console.log('Response Body:', res.body);
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property('character');
+    expect(res.body)
+      .to.have.property('message')
+      .equal('Character successfully updated');
+    expect(res.body.character).to.have.property('name').equal('Rudy');
+    expect(res.body.character).to.have.property('age').equal(10);
   });
 
-  it('should delete a single character on /characters/:id DELETE', (done) => {
-    chai
+  it('should delete a character on /characters/:id DELETE', async () => {
+    const res = await chai
       .request(app)
-      .delete(`/characters/${createdCharacter._id}`)
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.have
-          .property('message')
-          .eql('Character successfully deleted');
-        done();
-      });
+      .delete(`/characters/${testCharacter._id}`)
+      .set('Cookie', `nToken=${token}`);
+    console.log('Response Status:', res.status);
+    console.log('Response Body:', res.body);
+
+    expect(res).to.have.status(200);
+    expect(res.body)
+      .to.have.property('message')
+      .equal('Character successfully deleted');
   });
 });
