@@ -1,6 +1,5 @@
 # Bob's Burgers API
-
-Use this Bob's Burgers API to get information about your favorite characters and their best quotes.
+Use this Bob's Burgers API to get information about your favorite characters and their best quotes or to add, update, or delete characters and quotes.
 
 [Link to API documentation](https://kangjoa.github.io/api-project-docs/#/)
 
