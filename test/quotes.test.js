@@ -1,140 +1,138 @@
-// Run with: mocha test/quote.js
+// run tests with:  mocha test/quotes.test.js --exit
 
-const app = require('../server');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const expect = chai.expect;
 const should = chai.should();
+const app = require('../server');
+const User = require('../models/user');
 const Quote = require('../models/quote');
 const Character = require('../models/character');
-const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 chai.use(chaiHttp);
 
-describe('Quote API Tests', function () {
-  let createdQuote;
-  let createdCharacter;
+describe('Quotes API Tests', function () {
+  let testUser;
+  let token;
+  let testQuote;
+  let testCharacter;
 
-  beforeEach((done) => {
-    Character.create({
+  before(async () => {
+    try {
+      testUser = await User.create({
+        username: 'testUser2',
+        password: 'testPassword2',
+      });
+      token = jwt.sign({ _id: testUser._id }, process.env.SECRET, {
+        expiresIn: '2h',
+      });
+    } catch (error) {
+      console.error('Error during user creation:', error);
+    }
+    testCharacter = await Character.create({
       name: 'Regular Sized Rudy',
       age: 10,
-    })
-      .then((character) => {
-        createdCharacter = character;
-        return Quote.create({
-          content: "I've tasted life, but I'm hungry for more",
-          season: 3,
-          episode: 22,
-          characterId: character._id,
-        });
-      })
-      .then((quote) => {
-        createdQuote = quote;
-        console.log('Created quote successfully:', quote);
-        done();
-      })
-      .catch((err) => {
-        console.error('Error creating character or quote:', err);
-        done(err);
-      });
+    });
+    testQuote = await Quote.create({
+      content: 'New Quote Content',
+      season: 111,
+      episode: 222,
+      characterId: testCharacter._id,
+    });
   });
 
-  afterEach((done) => {
-    // Delete both the quote and the character
-    Promise.all([
-      Quote.deleteOne({ _id: createdQuote._id }),
-      Character.deleteOne({ _id: createdCharacter._id }),
-    ])
-      .then(() => done())
-      .catch((err) => done(err));
+  after(async () => {
+    await User.deleteOne({ _id: testUser._id });
   });
 
-  it('should get all quotes on /quotes GET', (done) => {
-    // Adding a delay to allow the database to populate
-    setTimeout(() => {
-      chai
-        .request(app)
-        .get('/quotes')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('object');
-          res.body.should.have.property('quotes').with.lengthOf.at.least(1);
-          done();
-        });
-    }, 500);
-  });
-
-  it('should show a single quote on /quotes/:id GET', (done) => {
-    chai
+  it('should get all quotes on /quotes GET', async () => {
+    const res = await chai
       .request(app)
-      .get(`/quotes/${createdQuote._id}`)
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.a('object');
-        res.body.should.have.property('quote');
-        res.body.quote.should.have
-          .property('content')
-          .eql("I've tasted life, but I'm hungry for more");
-        done();
-      });
+      .get('/quotes')
+      .set('Cookie', `nToken=${token}`);
+    console.log('Response Status:', res.status);
+    console.log('Response Body:', res.body);
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property('quotes');
+    res.body.should.have.property('quotes').with.lengthOf.at.least(1);
   });
 
-  it('should create a single quote on /quotes POST', (done) => {
-    let newQuote = {
-      content: "I've tasted life, but I'm hungry for more",
-      season: 3,
-      episode: 22,
-      characterId: createdCharacter._id,
-    };
+  it('should get a single quote on /quotes/:id GET', async () => {
+    const res = await chai
+      .request(app)
+      .get(`/quotes/${testQuote._id}`)
+      .set('Cookie', `nToken=${token}`);
+    console.log('Response Status:', res.status);
+    console.log('Response Body:', res.body);
 
-    chai
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property('quote');
+    expect(res.body.quote)
+      .to.have.property('content')
+      .equal('New Quote Content');
+  });
+
+  it('should create a quote on /quotes POST', async () => {
+    const res = await chai
       .request(app)
       .post('/quotes')
-      .send(newQuote)
-      .end((err, res) => {
-        if (err) done(err);
-        res.should.have.status(201);
-        res.body.should.be.a('object');
-        res.body.should.have
-          .property('message')
-          .eql('Quote successfully created');
-        res.body.quote.should.have
-          .property('content')
-          .eql("I've tasted life, but I'm hungry for more");
-        done();
+      .set('Cookie', `nToken=${token}`)
+      .send({
+        content: 'Exciting New Quote Content',
+        season: 112,
+        episode: 223,
+        characterId: testCharacter._id,
       });
+    console.log('Response Status:', res.status);
+    console.log('Response Body:', res.body);
+
+    expect(res).to.have.status(201);
+    expect(res.body).to.have.property('quote');
+    expect(res.body.quote)
+      .to.have.property('content')
+      .equal('Exciting New Quote Content');
+    expect(res.body.quote).to.have.property('season').equal(112);
   });
 
-  it('should update a single quote on /quotes/:id PUT', (done) => {
-    chai
+  it('should update a quote on /quotes/:id PUT', async () => {
+    const res = await chai
       .request(app)
-      .put(`/quotes/${createdQuote._id}`)
-      .send({ content: 'Updated quote content here.' })
-      .end((err, res) => {
-        if (err) done(err);
-        res.should.have.status(200);
-        res.body.should.be.a('object');
-        res.body.should.have
-          .property('message')
-          .eql('Quote successfully updated');
-        res.body.quote.should.have
-          .property('content')
-          .eql('Updated quote content here.');
-        console.log('Response body:', res.body);
-        done();
+      .put(`/quotes/${testQuote._id}`)
+      .set('Cookie', `nToken=${token}`)
+      .send({
+        content: 'Updated Exciting New Quote Content',
+        season: 112,
+        episode: 223,
+        characterId: testCharacter._id,
       });
+    console.log('Response Status:', res.status);
+    console.log('Response Body:', res.body);
+
+    expect(res).to.have.status(200);
+    expect(res.body).to.have.property('quote');
+    expect(res.body)
+      .to.have.property('message')
+      .equal('Quote successfully updated');
+    expect(res.body.quote)
+      .to.have.property('content')
+      .equal('Updated Exciting New Quote Content');
+    expect(res.body.quote).to.have.property('season').equal(112);
   });
 
-  it('should delete a quote on /quotes/:id DELETE', (done) => {
-    chai
+  it('should delete a quote on /quotes/:id DELETE', async () => {
+    const res = await chai
       .request(app)
-      .delete(`/quotes/${createdQuote._id}`)
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.have
-          .property('message')
-          .eql('Quote successfully deleted');
-        done();
-      });
+      .delete(`/quotes/${testQuote._id}`)
+      .set('Cookie', `nToken=${token}`);
+    console.log('Response Status:', res.status);
+    console.log('Response Body:', res.body);
+
+    expect(res).to.have.status(200);
+    expect(res.body)
+      .to.have.property('message')
+      .equal('Quote successfully deleted');
   });
 });
