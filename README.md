@@ -4,6 +4,8 @@ Use this Bob's Burgers API to get information about your favorite characters and
 
 [Link to API documentation](https://kangjoa.github.io/api-project-docs/#/)
 
+[Link to deployed API](https://api-project-s83q.onrender.com/) to use with Postman (there is no front end).
+
 ## Getting Started
 
 1. Clone the repository with:
