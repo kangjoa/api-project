@@ -17,13 +17,16 @@ app.use(cookieParser());
 
 // Routes
 const characters = require('./controllers/characters');
-characters(app);
-const quotes = require('./controllers/quotes');
-quotes(app);
-const auth = require('./controllers/auth.js');
-auth(app);
 
-const { ensureAuthenticated } = require('./middleware');
+characters(app);
+
+const quotes = require('./controllers/quotes');
+
+quotes(app);
+
+const auth = require('./controllers/auth');
+
+auth(app);
 
 // Start the Server
 app.listen(3000, () => {

@@ -60,7 +60,7 @@ module.exports = function (app) {
         if (!character) {
           return res.status(404).json({ error: 'No characters found' });
         }
-        res
+        return res
           .status(200)
           .json({ message: 'Character successfully updated', character });
       })

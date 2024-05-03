@@ -1,10 +1,8 @@
-const User = require('../models/user');
+/* eslint-disable no-underscore-dangle */
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 module.exports = (app) => {
-  // SIGN UP FORM
-  // app.get('/sign-up', (req, res) => res.status(200));
-
   app.post('/sign-up', async (req, res) => {
     // Create User and JWT
     try {
@@ -15,28 +13,19 @@ module.exports = (app) => {
         expiresIn: '60 days',
       });
       res.cookie('nToken', token, { maxAge: 900000, httpOnly: true });
-      res.status(201).send({ message: 'User successfully created', token });
+      return res
+        .status(201)
+        .send({ message: 'User successfully created', token });
     } catch (err) {
-      console.log(err.message);
       return res
         .status(400)
         .send({ error: 'Failed to create user', message: err.message });
     }
   });
 
-  // LOGOUT
-  // app.get('/logout', (req, res) => {
-  //   res.clearCookie('nToken');
-  //   return res.redirect('/');
-  // });
-
-  // LOGIN FORM
-  // app.get('/login', (req, res) => res.render('login'));
-
   // LOGIN
   app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    console.log(`username and password log`, req.body);
 
     try {
       const user = await User.findOne({ username }, { password });
@@ -46,7 +35,7 @@ module.exports = (app) => {
       }
 
       // Check the password
-      const isMatch = await new Promise((resolve, reject) => {
+      await new Promise((resolve, reject) => {
         user.comparePassword(password, (err, match) => {
           if (err) reject(err);
           resolve(match);
@@ -66,8 +55,7 @@ module.exports = (app) => {
       res.cookie('nToken', token, { maxAge: 900000, httpOnly: true });
       return res.status(200).send({ token });
     } catch (err) {
-      console.log(err);
-      res.status(500).send({ message: 'Internal Server Error' });
+      return res.status(500).send({ message: 'Internal Server Error' });
     }
   });
 };

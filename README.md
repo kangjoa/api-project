@@ -1,36 +1,52 @@
-# 🔐 auth-api-starterpack
+# Bob's Burgers API
 
-[![GitHub](https://img.shields.io/github/forks/droxey/auth-api-starterpack.svg?style=flat-square)](https://github.com/droxey/auth-api-starterpack/network)
-[![GitHub](https://img.shields.io/github/issues/droxey/auth-api-starterpack.svg?style=flat-square)](https://github.com/droxey/auth-api-starterpack/issues)
-[![The MIT License](https://img.shields.io/badge/license-MIT-orange.svg?style=flat-square)](http://opensource.org/licenses/MIT)
+Use this Bob's Burgers API to get information about your favorite characters and their best quotes.
 
-Custom, authenticated API instructions and starter pack for BEW 1.3 students!
+[Link to API documentation](https://kangjoa.github.io/api-project-docs/#/)
 
-## Installation
+## Getting Started
 
-1. Fork this repository and clone your fork locally.
-1. Open the repository folder in your editor of choice:
+1. Clone the repository with:
+```zsh
+git clone https://github.com/kangjoa/api-project.git
+```
 
-    ```bash
-    $ cd auth-api-starterpack
-    $ atom .
-    ```
+2. Install dependencies:
+```zsh
+npm install
+```
 
-1. Run `npm install` to install project dependencies into the activated environment.
-1. Execute `npm start` to run the development server.
+3. Run the server in development mode:
+```zsh
+nodemon server
+```
 
-## Development
+## Authentication and Authorization
+Users must sign up and log in with a valid username and password in order to use the API.
+| Method | Endpoint | Purpose |
+| -------- | -------- | -------- |
+| POST | `/sign-up` | Create an account |
+| POST | `/login` | Get access to API with valid credentials |
 
-### `#TODO` === Hint
 
-* I've added **helpful `#TODO` placeholders, comments, and hints throughout the project** to jog your memory in case you need a hand! Simply `CTRL` + `Shift` + `F` to Find All in your editor, and **search for `#TODO`.** You'll find a helpful list of hints waiting for you!
 
-## Deployment
+## Characters
+| Method | Endpoint | Purpose |
+| -------- | -------- | -------- |
+| GET | `/characters` | Show all characters |
+| GET | `/characters/:characterId` | Show one character by ID |
+| POST | `/characters` | Create a character |
+| PUT | `/characters/:characterId` | Update a character |
+| DELETE | `/characters/:characterId` | Delete a character |
 
-### Heroku
 
-Follow this [Node.js Deployment Guide](https://devcenter.heroku.com/articles/getting-started-with-nodejs) to deploy your application on Heroku. Be sure to complete all of the steps!
+## Quotes
 
-## [BEW 1.3] Project Requirements
+| Method | Endpoint | Purpose |
+| -------- | -------- | -------- |
+| GET | `/quotes` | Show all quotes |
+| GET | `/quotes/:quoteId` | Show one quote by ID |
+| POST | `/quotes` | Create a quote |
+| PUT | `/quotes/:quoteId` | Update a quote |
+| DELETE | `/quotes/:quoteId` | Delete a quote |
 
-* View the [**requirements document**](https://github.com/Product-College-Courses/BEW-1.2-Authentication-and-Associations/blob/master/Projects/02-Custom-API-Project.md) in the [Class Repository](https://github.com/Product-College-Courses/BEW-1.2-Authentication-and-Associations).
