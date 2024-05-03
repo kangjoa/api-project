@@ -10,12 +10,15 @@ const User = require('../models/user');
 const url = 'mongodb://localhost/db';
 
 mongoose
-  .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(process.env.DB_CONNECTION_STRING || url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(async () => {
     console.log('Connected successfully to database');
 
     // Drop all collections
-    for (var i in mongoose.connection.collections) {
+    for (const i in mongoose.connection.collections) {
       await mongoose.connection.collections[i].deleteMany({});
     }
 
